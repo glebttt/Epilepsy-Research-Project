@@ -117,3 +117,87 @@ y = y_region;
 
 
 
+%% %% __________ FIT GLM (Poisson) _________________________
+fprintf('Fitting Poisson GLM...\n');
+
+
+[b, dev, stats] = glmfit(X, y, 'poisson','link','log');
+
+
+% Extract intercept and weigths beta(0) and beta(1)
+const = b(1);
+weights = b(2:end);
+
+
+
+
+numCoupledNeurons = size(X,2) - numDelays_self;  
+numCoupledNeurons = numCoupledNeurons / numDelays_cross; 
+
+neuronNames = cell(1,numCoupledNeurons);
+for k = 1:numCoupledNeurons
+    neuronNames{k} = ['Neuron ' num2str(k)];
+end
+
+
+
+selfFilt = weights(1 : numDelays_self);
+
+
+couplingFilts = [];
+idx = numDelays_self + 1;
+
+for n = 1:numCoupledNeurons
+    couplingFilts(:, n) = weights(idx : idx + numDelays_cross - 1);
+    idx = idx + numDelays_cross;
+end
+
+%  PREVISION FIRING RATE 
+lambda = exp(const + X * weights);
+
+fprintf("lambda : %d",lambda);
+
+figure; clf;
+
+% --- 1. Plot spike-history of the targeted neuron
+subplot(2,2,1);
+stem( - (1:numDelays_self), selfFilt, 'LineWidth', 2 );
+title('Spike-history filter'); xlabel('lag (bins)'); ylabel('weight');
+grid on;
+
+% --- 2. Plot coupling filters 
+subplot(2,2,2);
+hold on;
+for n = 1:numCoupledNeurons
+    plot( - (1:numDelays_cross), couplingFilts(:,n), 'LineWidth', 2 );
+end
+hold off;
+title('Coupling filters (incoming)'); 
+xlabel('lag (bins)'); ylabel('weight');
+legend(neuronNames, 'Location', 'best');  % se hai i nomi
+grid on;
+
+% --- 3. Plot spike vs firing rate
+subplot(2,2,3);
+binsToPlot = 1:200;   % cambia come vuoi
+plot(binsToPlot, y(binsToPlot), 'k', 'LineWidth', 1.5); hold on;
+plot(binsToPlot, lambda(binsToPlot), 'r', 'LineWidth', 2);
+title('Spikes vs Predicted Firing Rate');
+xlabel('time bin'); ylabel('spikes / rate');
+legend('Observed', 'Predicted');
+grid on;
+
+% --- 4. Deviance / LL / AIC
+subplot(2,2,4);
+text(0.1, 0.8, sprintf('Deviance: %.2f', dev), 'FontSize', 12);
+logL = sum( y .* log(lambda + eps) - lambda );
+AIC = 2*length(b) - 2*logL;
+text(0.1, 0.6, sprintf('Log-Likelihood: %.2f', logL), 'FontSize', 12);
+text(0.1, 0.4, sprintf('AIC: %.2f', AIC), 'FontSize', 12);
+axis off;
+title('Model Statistics');
+
+sgtitle(sprintf('GLM neuron %d', region));
+
+
+
