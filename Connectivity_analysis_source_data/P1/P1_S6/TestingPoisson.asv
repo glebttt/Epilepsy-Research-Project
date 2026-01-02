@@ -1,0 +1,53 @@
+load('initial_synthetic_network.mat')
+
+
+%%
+
+
+
+
+patientNo = 1;
+
+
+
+
+
+
+pastTimeSelf = 0.2;  
+pastTimeCross = 0.1;  
+
+
+
+
+numDelays_self  = 10;
+numDelays_cross = 10;
+
+
+
+region = 1;
+
+y_region = Y(region,:);
+
+self_history = historicalVec(numDelays_self, y_region.');  
+
+
+
+cross_history = [];
+
+
+n = size(Y,1);
+for i = 1:n
+    if i == region
+        continue;                                  
+    end
+    increment_curr = Y(i, :);             
+    curr_region_history = historicalVec(numDelays_cross, increment_curr.');      
+    cross_history = [cross_history, curr_region_history];           % concatenating regions
+end
+
+
+X = [self_history, cross_history];   % getting self and cross history
+y = y_region;                       
+
+
+fitglm(X,y,'p')
