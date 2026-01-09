@@ -58,7 +58,7 @@ end
 % -------------------------------
 
 d = 2;           % delay (bins) => 3 bins = 12 ms
-sigma = 0.8;     % smoothness (bins) 
+sigma = 0.8;     % smoothness (bins) => ~ 6 ms spread
 
 C = zeros(N,N,Kc);
 kvec = 1:Kc;

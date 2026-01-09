@@ -1,26 +1,11 @@
-load('initial_synthetic_network.mat')
-
-
+load('test.mat')
 %%
-
-
 
 
 patientNo = 1;
 
-
-
-
-
-
-pastTimeSelf = 0.2;  
-pastTimeCross = 0.1;  
-
-
-
-
-numDelays_self  = 10;
-numDelays_cross = 10;
+numDelays_self  = 5;
+numDelays_cross = 5;
 
 
 
@@ -50,4 +35,15 @@ X = [self_history, cross_history];   % getting self and cross history
 y = y_region;                       
 
 
-fitglm(X,y,'p')
+% mdl = fitglm(X,y,'linear','Distribution','poisson');
+
+
+[B,FitInfo] = lassoglm(X,y,'poisson',
+
+
+%% gather statistics
+
+
+fprintf('Number of ')
+
+
