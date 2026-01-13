@@ -8,7 +8,7 @@ clear; clc; rng(1);
 %% -------------------------------
 % Simulation parameters
 % -------------------------------
-N  = 4;                 % number of brain regions
+N  = 2;                 % number of brain regions
 dt = 0.004;             % time bin (4 ms)
 Tsec = 3600;             % total duration (seconds)
 T  = round(Tsec / dt);  % number of time bins
@@ -38,9 +38,9 @@ beta0 = log(rate_hz * dt);
 % A(j,i) = 1 means j -> i
 % -------------------------------
 A = zeros(N,N);
-A(1,2) = 1;
-A(1,3) = 1;
-A(1,4) = 1;
+A(1,2) = 1; % uncomment to revert
+% A(1,3) = 1;
+% A(1,4) = 1;
 
 %% -------------------------------
 % Self-history filters (refractory)
@@ -72,6 +72,9 @@ for j = 1:N
     for i = 1:N
         if A(j,i) ~= 0
             C(j,i,:) = B(j,i) * exp(-(kvec - d).^2 / (2*sigma^2));
+        
+        else
+            disp('zero');
         end
     end
 end
@@ -169,4 +172,4 @@ end
 
 
 
-save('test.mat','Y');
+save('test_2_node.mat','Y');
