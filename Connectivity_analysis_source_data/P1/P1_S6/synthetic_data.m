@@ -8,7 +8,7 @@ clear; clc; rng(1);
 %% -------------------------------
 % Simulation parameters
 % -------------------------------
-N  = 2;                 % number of brain regions
+N  = 4;                 % number of brain regions
 dt = 0.004;             % time bin (4 ms)
 Tsec = 3600;             % total duration (seconds)
 T  = round(Tsec / dt);  % number of time bins
@@ -27,8 +27,10 @@ fprintf('Simulating %d regions for %.1f seconds (%d bins)\n', ...
 % come back
 % to be determiened based on impirical data later 
 rate_hz = zeros(N,1);
-rate_hz(1)   = 0.3;    % hub: 15/min
-rate_hz(2:4) = 0.15;   % others: 7.5/min 
+
+factor = 20;
+rate_hz(1)   = 0.3 * factor ;    % hub: 15/min  % multiply by factor
+rate_hz(2:4) = 0.15 * factor;   % others: 7.5/min 
 
 beta0 = log(rate_hz * dt);   
    % baseline log-rate
@@ -39,8 +41,8 @@ beta0 = log(rate_hz * dt);
 % -------------------------------
 A = zeros(N,N);
 A(1,2) = 1; % uncomment to revert
-% A(1,3) = 1;
-% A(1,4) = 1;
+A(1,3) = 1;
+A(1,4) = 1;
 
 %% -------------------------------
 % Self-history filters (refractory)
@@ -172,4 +174,4 @@ end
 
 
 
-save('test_2_node.mat','Y');
+save('test_4_nodes_factor_20.mat','Y');
